@@ -1,3 +1,24 @@
-<script>
-  document.body.innerHTML = "JS works!";
-</script>
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>js test</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' 'unsafe-inline' data:;">
+  <style>
+    body { min-height: 100vh; margin: 0; display: flex; align-items: center; justify-content: center; background: #eee; color: #000; font-size: 28px; }
+  </style>
+</head>
+<body>
+  <noscript><div id="noscript">NO JS</div></noscript>
+
+  <script>
+    try {
+      document.body.innerHTML = "JS works! " + (navigator.userAgent || "");
+      console.log("Inline script ran successfully");
+    } catch (e) {
+      console.error("Script error:", e);
+      document.body.innerHTML = "Script threw error: " + e;
+    }
+  </script>
+</body>
+</html>
