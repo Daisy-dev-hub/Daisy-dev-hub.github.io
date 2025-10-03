@@ -2,7 +2,7 @@
 async function testCamMic() {
   try {
     let stream = await navigator.mediaDevices.getUserMedia({ video: true});
-    document.body.innerHTML = "SUCCESS: Got camera/mic access";
+    document.body.innerHTML = "SUCCESS: Got camera access";
   } catch(e) {
     document.body.innerHTML = "FAILED: " + e;
   }
