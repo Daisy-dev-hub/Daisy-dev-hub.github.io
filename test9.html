@@ -1,0 +1,68 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>maliciousMethods scan</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<style>body{font-family:system-ui;padding:12px}h3{margin:0 0 8px}p{color:#666;margin:4px 0 12px}table{width:100%;border-collapse:collapse}th,td{border:1px solid #ddd;padding:6px;font-size:13px;text-align:left}th{background:#f6f6f6}</style>
+</head>
+<body>
+<h3>maliciousMethods 扫描</h3>
+<p>仅检测方法名出现位置，不执行任何方法</p>
+<button id="scan">重新扫描</button>
+<table><thead><tr><th>方法</th><th>发现</th><th>位置</th></tr></thead><tbody id="body"></tbody></table>
+<script>
+const maliciousMethods=["exec","runCommand","shell","installApk","startActivity","delete","remove","readFile","openFile","listFiles","getInstalledPackages","getIMEI","getDeviceId","sendSMS","getContacts","getAccounts","getLogs","requestPermission","grantPermission","setClipboard","getClipboard"];
+const prefer=["Android","android","JSInterface","JsBridge","NativeBridge","AppInterface","WebAppInterface"];
+const btn=document.getElementById('scan'), out=document.getElementById('body');
+function owners(){
+  const s=new Set();
+  for(const n of prefer) if(window[n]) s.add(n);
+  let names=[];
+  try{names=Object.getOwnPropertyNames(window)}catch(e){}
+  for(const n of names){
+    if(s.size>200) break;
+    if(prefer.some(p=>n.includes(p))) s.add(n);
+    else{
+      try{const v=window[n]; if(v && (typeof v==='object'||typeof v==='function')){ const p=Object.getOwnPropertyNames(v||{}); if(p.length>0) s.add(n); }}catch(e){}
+    }
+  }
+  s.add('window');
+  return Array.from(s);
+}
+function scan(){
+  out.innerHTML='';
+  const os=owners();
+  const rpt={};
+  for(const m of maliciousMethods) rpt[m]=[];
+  for(const owner of os){
+    const obj = owner==='window'?window:window[owner];
+    if(!obj) continue;
+    let names=[];
+    try{names=Object.getOwnPropertyNames(obj)}catch(e){}
+    try{for(let k in obj) names.push(k)}catch(e){}
+    const set=new Set(names);
+    for(const m of maliciousMethods){
+      try{
+        if(set.has(m) || (m in obj)){
+          rpt[m].push(owner+":"+ (typeof obj[m]));
+        }
+      }catch(e){}
+    }
+  }
+  for(const m of maliciousMethods){
+    const tr=document.createElement('tr');
+    const c1=document.createElement('td'), c2=document.createElement('td'), c3=document.createElement('td');
+    c1.textContent=m;
+    c2.textContent=rpt[m].length? 'yes':'no';
+    c2.style.color = rpt[m].length? '#b85':'';
+    c3.textContent=rpt[m].join('; ');
+    tr.appendChild(c1); tr.appendChild(c2); tr.appendChild(c3);
+    out.appendChild(tr);
+  }
+}
+btn.onclick=()=>{btn.disabled=true; setTimeout(()=>{scan(); btn.disabled=false},50)};
+window.addEventListener('load', ()=>setTimeout(()=>btn.click(),150));
+</script>
+</body>
+</html>
